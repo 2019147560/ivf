@@ -7,6 +7,7 @@ void main() {
   runApp(const MyApp());
 }
 
+//MyApp:처음 빌드-> LoginPage:로그인화면-> MyHomePage:메인화면 <-> SecondRoute:성경입력화면
 String myusername = 'hamjun923';
 void fetchcode2() {}
 
@@ -283,7 +284,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const LoginPage(title: 'Flutter Demo Home Page'),
+      home: const LoginPage(title: 'Flutter Demo Home Page'), //처음 갈 페이지 지정
     );
   }
 }
@@ -296,7 +297,7 @@ class SecondRoute extends StatefulWidget {
 class _SecondRouteState extends State<SecondRoute> {
   String verse = "";
   String abc = '';
-  Future<String> fetchcode //get http
+  Future<String> fetchcode //성경 api 요청 함수
       (String biblename, String chapter, String verses, String verses2) async {
     print(biblename);
     for (int i = int.parse(verses); i <= int.parse(verses2); i++) {
@@ -329,6 +330,7 @@ class _SecondRouteState extends State<SecondRoute> {
   }
 
   Future<String> fetchchapter(String bibleinit) async {
+    //창세기 선택하면 몇장까지 있는지 출력
     String biblesearch = bibleinitial[bible1.indexOf(bibleinit)];
     final url = Uri.parse(
       "https://api.scripture.api.bible/v1/bibles/bba9f40183526463-01/books/$biblesearch?include-chapters=true",
@@ -356,6 +358,7 @@ class _SecondRouteState extends State<SecondRoute> {
   }
 
   Future<String> fetchverse(String bibleinit, String biblechapter) async {
+    //창세기 2장하면 몇절까지 있는지 출력
     String biblesearch = bibleinitial[bible1.indexOf(bibleinit)];
     final url = Uri.parse(
       "https://api.scripture.api.bible/v1/bibles/bba9f40183526463-01/chapters/$biblesearch.$biblechapter?content-type=json&include-notes=false&include-titles=false&include-chapter-numbers=false&include-verse-numbers=false&include-verse-spans=false",
@@ -382,7 +385,7 @@ class _SecondRouteState extends State<SecondRoute> {
     }
   }
 
-  String? _dropdownValue;
+  String? _dropdownValue; //창세기~말라기 선택버튼에 쓰는 뭔가
   String? _dropdownValue2;
   String? _dropdownValue3;
   String? _dropdownValue4;
@@ -422,12 +425,14 @@ class _SecondRouteState extends State<SecondRoute> {
               Row(
                 children: [
                   DropdownButton(
+                      //창세기~말라기 선택버튼
                       value: _dropdownValue,
                       items: bible1.map((value) {
                         return DropdownMenuItem(
                             value: value, child: Text(value));
                       }).toList(),
                       onChanged: (newValue) {
+                        //선택이 됐을때 작동하는 함수
                         setState(() {
                           _dropdownValue = newValue;
                           fetchchapter(newValue!);
@@ -474,7 +479,9 @@ class _SecondRouteState extends State<SecondRoute> {
                         });
                       }),
                   const IconButton(
-                      onPressed: fetchcode2, icon: Icon(Icons.cached))
+                      //없음
+                      onPressed: fetchcode2,
+                      icon: Icon(Icons.cached))
                 ],
               ),
               Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
@@ -498,6 +505,7 @@ class _SecondRouteState extends State<SecondRoute> {
                         child: IconButton(
                           icon: const Icon(Icons.send),
                           onPressed: () => {
+                            //큐티 작성 완료 버튼
                             setState(() {
                               qtchunk qtc = qtchunk(
                                 _controller.text,
@@ -538,6 +546,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _incrementCounter() {
     setState(() {
+      //setstate=화면 새로고침
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
@@ -554,8 +563,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     print("!!!! first BUILD !!!!");
     for (qtchunk episode in yours) {
+      //yours라는 리스트에 qtchunk 클래스들이 저장돼있고 메인화면 출력할때마다 for문으로 하나하나 불러옴.
       print(episode.likenamelist);
       episode.chunk = Container(
+          //chunk라는 container가 큐티 게시글 하나를 모아놓은 화면덩어리(qtchunk라는 큐티클래스에서 불러옴.)
           decoration: const BoxDecoration(),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -611,6 +622,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: IconButton(
                         icon: const Icon(Icons.send),
                         onPressed: () => {
+                          //댓글달때 함수
                           setState(() {
                             episode.replylist
                                 .add([myusername, _controller.text]);
@@ -625,6 +637,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   IconButton(
                       onPressed: () => {
+                            //좋아요 버튼 누를때 함수수
                             /*this.likenamelist.add(myusername)*/ episode
                                 .likenamelist
                                 .add(myusername),
@@ -693,8 +706,11 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async => {
+          //큐티작성 화면으로 넘어가는 버튼 함수
           await Navigator.push(
-              context, MaterialPageRoute(builder: (context) => SecondRoute())),
+              context,
+              MaterialPageRoute(
+                  builder: (context) => SecondRoute())), //secondRoute로 감.
           setState(() {})
         },
         tooltip: 'Increment',
@@ -736,11 +752,13 @@ class _LoginPageState extends State<LoginPage> {
               setState(() {});
             },
             onTap: () {
-              myusername = _idcontroller.toString();
+              //로그인 버튼 클릭 함수
+              myusername = _idcontroller.text; //아이디 입력창에 있는 텍스트 불러오기
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => MyHomePage())); // 클릭 이벤트 처리할 코드 작성
+                      builder: (context) =>
+                          MyHomePage())); // =>myhomepage 이부분이 화면이동
             },
             child: Text(
               "Log In",
